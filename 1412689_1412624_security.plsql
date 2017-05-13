@@ -15,11 +15,11 @@ CREATE USER TP03 IDENTIFIED BY tp03;
 CREATE USER TP04 IDENTIFIED BY tp04;
 CREATE USER TP05 IDENTIFIED BY tp05;
 -----------Tai khoan truong chi nhanh---------------
-CREATE USER TCN01 IDENTIFIED BY tch01;
-CREATE USER TCN02 IDENTIFIED BY tch02;
-CREATE USER TCN03 IDENTIFIED BY tch03;
-CREATE USER TCN04 IDENTIFIED BY tch04;
-CREATE USER TCN05 IDENTIFIED BY tch05;
+CREATE USER TCN01 IDENTIFIED BY tcn01;
+CREATE USER TCN02 IDENTIFIED BY tcn02;
+CREATE USER TCN03 IDENTIFIED BY tcn03;
+CREATE USER TCN04 IDENTIFIED BY tcn04;
+CREATE USER TCN05 IDENTIFIED BY tcn05;
 -----------Tai khoan nhan vien-----------------
 CREATE USER NV01 IDENTIFIED BY nv01;
 CREATE USER NV02 IDENTIFIED BY nv02;
@@ -35,8 +35,26 @@ CREATE USER GD05 IDENTIFIED BY gd05;
 
 
 -- Tao cac role
-CREATE ROLE GiamDoc;
-CREATE ROLE TruongDuAn;
-CREATE ROLE TruongPhong;
-CREATE ROLE TruongChiNhanh;
-CREATE ROLE NhanVien;
+CREATE ROLE rGiamDoc;
+CREATE ROLE rTruongDuAn;
+CREATE ROLE rTruongPhong;
+CREATE ROLE rTruongChiNhanh;
+CREATE ROLE rNhanVien;
+
+
+-- DAC Giam doc duoc phep xem thong tin cac du an
+-- Tao views cho Giam Doc
+CREATE VIEW vGiamDoc 
+AS 
+SELECT DA.maDA, DA.tenDA, DA.kinhPhi, PB.tenPhong, CN.tenCN, NV.hoTen TruongDuAn, SUM(CT.soTien)TongChi FROM DuAn DA 
+JOIN PhongBan PB ON PB.maPhong = DA.phongChuTri
+JOIN NhanVien NV ON NV.maNV = DA.TRUONGDA
+JOIN ChiNhanh CN ON CN.maCN = PB.ChiNhanh
+JOIN ChiTieu CT ON CT.duAn = DA.maDA
+GROUP BY  DA.maDA, DA.tenDA, DA.kinhPhi, PB.tenPhong, CN.tenCN, NV.hoTen;
+-- Gan quyen xem vGiamDoc vao role rGiamDoc
+GRANT SELECT ON vGiamDoc to rGiamDoc;
+-- Gan role rGiamDoc cho cac user GiamDoc
+GRANT rGiamDoc to GD01,GD02, GD03, GD04, GD05;
+-- tao ket noi cho cac Giam Doc
+GRANT CREATE SESSION TO GD01,GD02, GD03, GD04, GD05;
