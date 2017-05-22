@@ -129,5 +129,33 @@ END;
 /
 EXECUTE sa_components.create_level ('ACCESS_DUAN',2000,'GH','GioiHan'); 
 EXECUTE sa_components.create_level ('ACCESS_DUAN',3000,'BM','BiMat');
-EXECUTE sa_components.create_level ('ACCESS_DUAN',4000,'BMC','BiMatCao');---------------------------------------------------
+EXECUTE sa_components.create_level ('ACCESS_DUAN',4000,'BMC','BiMatCao');
+-- Tạo compartment
+CONN sec_admin/secadmin;
+BEGIN
+sa_components.create_compartment
+(policy_name => 'ACCESS_DUAN',
+long_name => 'NhanSu',
+short_name => 'NS',
+comp_num => 2000);
+END;
+/
+EXECUTE sa_components.create_compartment ('ACCESS_DUAN',3000,'KT','KeToan');
+EXECUTE sa_components.create_compartment ('ACCESS_DUAN',1000,'KH','KeHoach');
+
+-- Tạo group
+CONN sec_admin/secadmin;
+BEGIN
+sa_components.create_group
+(policy_name => 'ACCESS_DUAN',
+long_name => 'TongCongTy',
+short_name => 'TCT',
+group_num => 10,
+parent_name => NULL);
+END;
+/
+EXECUTE sa_components.create_group ('ACCESS_DUAN',30,'HCM','Ho Chi Minh','TCT');
+EXECUTE sa_components.create_group ('ACCESS_DUAN',50,'HN','Ha Noi','TCT');
+EXECUTE sa_components.create_group ('ACCESS_DUAN',70,'DN','Da Nang','TCT');
+
 
