@@ -58,3 +58,11 @@ GRANT SELECT ON vGiamDoc to rGiamDoc;
 GRANT rGiamDoc to GD01,GD02, GD03, GD04, GD05;
 -- tao ket noi cho cac Giam Doc
 GRANT CREATE SESSION TO GD01,GD02, GD03, GD04, GD05;
+
+
+-- OLS
+-- tao user dbo_sec chiu trach nhiem quan ly nhung user nao duoc phep truy xuat du lieu trong chema dbo
+GRANT connect, create user, drop user,
+create role, drop any role
+to dbo_sec IDENTIFIED BY dbosec;
+

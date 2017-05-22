@@ -5,7 +5,6 @@
 Thành viên:
 * [x] **1412624** Nguyễn Quốc Anh Tú (nqatu)
 * [x] **1412689** Hoàng Thị Bích Vân (1412689)
-* [ ] **MSSV3** Tên sinh viên 2 (tên tài khoản github)
 
 ## Yêu cầu
 
