@@ -60,9 +60,17 @@ GRANT rGiamDoc to GD01,GD02, GD03, GD04, GD05;
 GRANT CREATE SESSION TO GD01,GD02, GD03, GD04, GD05;
 
 
+
 -- OLS
 -- tao user dbo_sec chiu trach nhiem quan ly nhung user nao duoc phep truy xuat du lieu trong chema dbo
 GRANT connect, create user, drop user,
 create role, drop any role
 to dbo_sec IDENTIFIED BY dbosec;
 
+--DAC Truong Phong 
+--Gan quyen update va them thong tin vao Du An cho role truong phong
+GRANT SELECT, INSERT, UPDATE ON DuAn TO rTruongPhong;
+--Gan role cho cac user truong phong
+GRANT rTruongPhong TO TP01, TP02, TP03, TP04, TP05;
+--Tao ket noi cac truong phong
+GRANT CREATE SESSION TO TP01, TP02, TP03, TP04, TP05;
