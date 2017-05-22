@@ -42,6 +42,15 @@ CREATE ROLE rTruongChiNhanh;
 CREATE ROLE rNhanVien;
 
 
+--DAC Truong Phong 
+--Gan quyen update va them thong tin vao Du An cho role truong phong
+GRANT SELECT, INSERT, UPDATE ON DuAn TO rTruongPhong;
+--Gan role cho cac user truong phong
+GRANT rTruongPhong TO TP01, TP02, TP03, TP04, TP05;
+--Tao ket noi cac truong phong
+GRANT CREATE SESSION TO TP01, TP02, TP03, TP04, TP05;
+
+
 -- DAC Giam doc duoc phep xem thong tin cac du an
 -- Tao views cho Giam Doc
 CREATE VIEW vGiamDoc 
@@ -66,11 +75,59 @@ GRANT CREATE SESSION TO GD01,GD02, GD03, GD04, GD05;
 GRANT connect, create user, drop user,
 create role, drop any role
 to dbo_sec IDENTIFIED BY dbosec;
+-- tạo user sec_admin chịu trách nhiệm quản lý chính sách bảo mật đành cho dữ liệu trong dbo
+GRANT connect TO sec_admin IDENTIFIED BY secadmin;
+-- Tạo ra các user là nhân viên trong công ty và role cho các nhân viên:
 
---DAC Truong Phong 
---Gan quyen update va them thong tin vao Du An cho role truong phong
-GRANT SELECT, INSERT, UPDATE ON DuAn TO rTruongPhong;
---Gan role cho cac user truong phong
-GRANT rTruongPhong TO TP01, TP02, TP03, TP04, TP05;
---Tao ket noi cac truong phong
-GRANT CREATE SESSION TO TP01, TP02, TP03, TP04, TP05;
+
+-- Ta dùng procedure SA_SYSDBA.CREATE_POLICY để tạo ra chính sách mới (bước 1 trong quy trình hiện thực OLS). 
+--Quyền thực thi thủ tục này được cấp mặc định cho LBACSYS.
+-- tạo ra một chính sách dùng để điều khiển các truy xuất đến bảng DuAn của dbo với tên gọi là “ACCESS_DUAN” và có cột chứa nhãn tên là “OLS_COLUMN”.
+CONN lbacsys/lbacsys;
+begin
+SA_SYSDBA.CREATE_POLICY(
+    policy_name => 'ACCESS_DUAN',
+    column_name =>'OLS_COLUMN');
+)
+end;
+
+
+
+--- sec_admin sẽ là user chịu trách nhiệm quản lý chính sách, duy trì hoạt động của nó
+-- dbo_sec sẽ quyết định quyền truy xuất dữ liệu trong schema dbo của các user khác dựa trên mức độ tin cậy của họ
+
+
+-- cấp cho user sec_admin role quản trị và các quyền thực thi trên các package liên quan:
+CONN lbacsys/lbacsys;
+GRANT access_duan_dba TO sec_admin;
+-- Package dùng để tạo ra các thành phần của nhãn
+GRANT execute ON sa_components TO sec_admin;
+-- Package dùng để tạo các nhãn
+GRANT execute ON sa_label_admin TO sec_admin;
+-- Package dùng để gán chính sách cho các table/schema
+GRANT execute ON sa_policy_admin TO sec_admin;
+
+-- Để dbo_SEC có thể quản lý việc truy xuất của các user, 
+-- ta cũng cần cấp cho user này role quản trị của chính sách và 
+-- các quyền thực thi trên các package liên quan:
+CONN lbacsys/lbacsys;
+GRANT access_duan_dba TO dbo_sec;
+-- Package dùng để gán các label cho user
+GRANT execute ON sa_user_admin TO dbo_sec;
+
+
+------------ tạo level
+
+CONN sec_admin/secadmin;
+BEGIN
+sa_components.create_level (
+policy_name => 'ACCESS_DUAN', 
+long_name => 'ThongThuong', 
+short_name => 'TT',
+level_num => 1000);
+END;
+/
+EXECUTE sa_components.create_level ('ACCESS_DUAN',2000,'GH','GioiHan'); 
+EXECUTE sa_components.create_level ('ACCESS_DUAN',3000,'BM','BiMat');
+EXECUTE sa_components.create_level ('ACCESS_DUAN',4000,'BMC','BiMatCao');---------------------------------------------------
+
